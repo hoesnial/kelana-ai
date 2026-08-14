@@ -8,20 +8,36 @@ AI Travel Planner — build with Python, Next.js & Amazon Bedrock.
 kelana-ai/
 ├── README.md
 ├── backend/
-│   └── main.py        # Trip Summary Generator (console app)
+│   ├── main.py                    # Presentation layer (console app)
+│   └── services/
+│       └── trip_service.py        # Business logic
 └── frontend/
     └── .gitkeep
 ```
 
+## Sessions
+
+### Session 1: Trip Summary Generator
+
+Console app that takes destination, country, days, budget, currency, and travel month, then prints a trip summary.
+
+### Session 2: Recommendation Engine
+
+- Trip category (Backpacker / Standard / Luxury)
+- Travel season (Peak / Holiday / Regular)
+- Daily budget calculation
+- Recommended places
+- Modular service architecture (business logic separated from presentation)
+
 ## Run
 
 ```bash
-cd backend
-python3 main.py
+python3 backend/main.py
 ```
 
 ## Roadmap
 
 - [x] Trip Summary Generator (console, Python)
+- [x] Recommendation Engine (console, Python)
 - [ ] Frontend (Next.js)
 - [ ] Trip planner backed by Amazon Bedrock
