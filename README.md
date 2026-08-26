@@ -14,7 +14,8 @@ kelana-ai/
 │   ├── schemas.py                 # Pydantic schemas
 │   ├── requirements.txt
 │   └── services/
-│       └── trip_service.py        # Business logic
+│       ├── trip_service.py        # Business logic
+│       └── bedrock_service.py     # Amazon Bedrock itinerary generation
 └── frontend/
     └── .gitkeep
 ```
@@ -47,6 +48,16 @@ Console app that takes destination, country, days, budget, currency, and travel 
   - `PUT /api/v1/trips/{id}` (recalculates `category` & `daily_budget` from new `budget`)
   - `DELETE /api/v1/trips/{id}` (returns 404 when not found)
 
+### Session 5: Amazon Bedrock Integration
+
+- `bedrock_service.py` builds a rich prompt that instructs the model to produce a
+  structured daily itinerary (Morning / Afternoon / Evening).
+- `POST /api/v1/trips/{id}/generate` generates the itinerary via Amazon Bedrock and
+  saves it to the `ai_recommendation` column in PostgreSQL.
+- The model ID is configurable via `BEDROCK_MODEL_ID` (default `amazon.titan-text-express-v1`).
+- If Bedrock is unreachable or unconfigured, a deterministic sample itinerary is returned
+  so the endpoint stays usable.
+
 ## Run
 
 ```bash
@@ -57,6 +68,8 @@ pip install -r backend/requirements.txt
 
 # 2. Start the API (Swagger UI at http://localhost:8000/docs)
 DATABASE_URL=postgresql+psycopg2://user:password@localhost:5432/kelana_ai \
+BEDROCK_MODEL_ID=amazon.titan-text-express-v1 \
+AWS_REGION=us-east-1 \
   uvicorn main:app --app-dir backend --reload
 ```
 
@@ -66,5 +79,6 @@ DATABASE_URL=postgresql+psycopg2://user:password@localhost:5432/kelana_ai \
 - [x] Recommendation Engine (console, Python)
 - [x] REST API (FastAPI)
 - [x] PostgreSQL persistence (SQLAlchemy CRUD)
+- [x] Amazon Bedrock itinerary generation
 - [ ] Frontend (Next.js)
 - [ ] Trip planner backed by Amazon Bedrock

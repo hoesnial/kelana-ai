@@ -1,9 +1,11 @@
 from fastapi import FastAPI, Depends, HTTPException
+from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from database import Base, engine, get_db
 from models import Trip
 from schemas import TripCreate, TripResponse, TripUpdate
+from services.bedrock_service import generate_itinerary
 from services.trip_service import (
     calculate_daily_budget,
     get_recommended_places,
@@ -12,6 +14,10 @@ from services.trip_service import (
 )
 
 Base.metadata.create_all(bind=engine)
+with engine.begin() as conn:
+    conn.execute(
+        text("ALTER TABLE trips ADD COLUMN IF NOT EXISTS ai_recommendation TEXT")
+    )
 
 app = FastAPI()
 
@@ -82,3 +88,15 @@ async def delete_trip(trip_id: int, db: Session = Depends(get_db)):
     db.delete(trip)
     db.commit()
     return None
+
+
+@app.post("/api/v1/trips/{trip_id}/generate", response_model=TripResponse)
+async def generate_trip_itinerary(trip_id: int, db: Session = Depends(get_db)):
+    trip = db.get(Trip, trip_id)
+    if trip is None:
+        raise HTTPException(status_code=404, detail="Trip not found")
+
+    trip.ai_recommendation = generate_itinerary(trip)
+    db.commit()
+    db.refresh(trip)
+    return trip
