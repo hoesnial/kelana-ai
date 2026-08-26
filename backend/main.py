@@ -1,11 +1,17 @@
-from fastapi import FastAPI
-from fastapi.responses import JSONResponse
+from fastapi import FastAPI, Depends, HTTPException
+from sqlalchemy.orm import Session
+
+from database import Base, engine, get_db
+from models import Trip
+from schemas import TripCreate, TripResponse, TripUpdate
 from services.trip_service import (
-    get_trip_category,
-    get_travel_season,
     calculate_daily_budget,
     get_recommended_places,
+    get_travel_season,
+    get_trip_category,
 )
+
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
@@ -18,3 +24,61 @@ async def recommendations():
 @app.get("/api/v1/transportations")
 async def transportations():
     return ["Bus", "Train", "Flight"]
+
+
+@app.post("/api/v1/trips", response_model=TripResponse, status_code=201)
+async def create_trip(payload: TripCreate, db: Session = Depends(get_db)):
+    trip = Trip(
+        destination=payload.destination,
+        country=payload.country,
+        days=payload.days,
+        budget=payload.budget,
+        currency=payload.currency,
+        travel_month=payload.travel_month,
+        category=get_trip_category(payload.budget),
+        daily_budget=calculate_daily_budget(payload.budget, payload.days),
+        season=get_travel_season(payload.travel_month),
+    )
+    db.add(trip)
+    db.commit()
+    db.refresh(trip)
+    return trip
+
+
+@app.get("/api/v1/trips", response_model=list[TripResponse])
+async def list_trips(db: Session = Depends(get_db)):
+    return db.query(Trip).all()
+
+
+@app.get("/api/v1/trips/{trip_id}", response_model=TripResponse)
+async def get_trip(trip_id: int, db: Session = Depends(get_db)):
+    trip = db.get(Trip, trip_id)
+    if trip is None:
+        raise HTTPException(status_code=404, detail="Trip not found")
+    return trip
+
+
+@app.put("/api/v1/trips/{trip_id}", response_model=TripResponse)
+async def update_trip(trip_id: int, payload: TripUpdate, db: Session = Depends(get_db)):
+    trip = db.get(Trip, trip_id)
+    if trip is None:
+        raise HTTPException(status_code=404, detail="Trip not found")
+
+    trip.budget = payload.budget
+    trip.category = get_trip_category(payload.budget)
+    trip.daily_budget = calculate_daily_budget(payload.budget, trip.days)
+
+    db.commit()
+    db.refresh(trip)
+    return trip
+
+
+@app.delete("/api/v1/trips/{trip_id}", status_code=204)
+async def delete_trip(trip_id: int, db: Session = Depends(get_db)):
+    trip = db.get(Trip, trip_id)
+    if trip is None:
+        raise HTTPException(status_code=404, detail="Trip not found")
+
+    db.delete(trip)
+    db.commit()
+    return None
