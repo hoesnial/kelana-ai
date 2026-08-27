@@ -17,7 +17,9 @@ kelana-ai/
 │       ├── trip_service.py        # Business logic
 │       └── bedrock_service.py     # Amazon Bedrock itinerary generation
 └── frontend/
-    └── .gitkeep
+    ├── src/app/page.tsx           # Homepage (hero, form, destinations)
+    ├── src/components/            # TripForm & Footer
+    └── public/                    # Hero & destination images
 ```
 
 ## Sessions
@@ -58,6 +60,14 @@ Console app that takes destination, country, days, budget, currency, and travel 
 - If Bedrock is unreachable or unconfigured, a deterministic sample itinerary is returned
   so the endpoint stays usable.
 
+### Session 6: Frontend Homepage
+
+- Next.js (App Router) + Tailwind CSS homepage with a hero image, trip planning form,
+  popular destinations, and a footer.
+- Fully responsive: the form grid stacks vertically on mobile.
+- The form calls the backend (`POST /api/v1/trips` + `POST /api/v1/trips/{id}/generate`)
+  and renders the returned AI itinerary.
+
 ## Run
 
 ```bash
@@ -71,6 +81,11 @@ DATABASE_URL=postgresql+psycopg2://user:password@localhost:5432/kelana_ai \
 BEDROCK_MODEL_ID=amazon.titan-text-express-v1 \
 AWS_REGION=us-east-1 \
   uvicorn main:app --app-dir backend --reload
+
+# 3. Start the frontend (http://localhost:3000)
+cd frontend
+npm install
+npm run dev
 ```
 
 ## Roadmap
@@ -80,5 +95,5 @@ AWS_REGION=us-east-1 \
 - [x] REST API (FastAPI)
 - [x] PostgreSQL persistence (SQLAlchemy CRUD)
 - [x] Amazon Bedrock itinerary generation
-- [ ] Frontend (Next.js)
+- [x] Frontend homepage (Next.js + Tailwind)
 - [ ] Trip planner backed by Amazon Bedrock
