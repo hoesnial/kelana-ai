@@ -72,6 +72,9 @@ export default function Home() {
             <a href="#destinations" className="transition hover:text-white">
               Destinations
             </a>
+            <a href="/trips" className="transition hover:text-white">
+              Trip History
+            </a>
             <a href="#about" className="transition hover:text-white">
               About
             </a>

@@ -19,6 +19,12 @@ with engine.begin() as conn:
     conn.execute(
         text("ALTER TABLE trips ADD COLUMN IF NOT EXISTS ai_recommendation TEXT")
     )
+    conn.execute(
+        text(
+            "ALTER TABLE trips ADD COLUMN IF NOT EXISTS travel_style "
+            "VARCHAR NOT NULL DEFAULT 'Solo'"
+        )
+    )
 
 app = FastAPI()
 
@@ -50,6 +56,7 @@ async def create_trip(payload: TripCreate, db: Session = Depends(get_db)):
         budget=payload.budget,
         currency=payload.currency,
         travel_month=payload.travel_month,
+        travel_style=payload.travel_style,
         category=get_trip_category(payload.budget),
         daily_budget=calculate_daily_budget(payload.budget, payload.days),
         season=get_travel_season(payload.travel_month),

@@ -9,6 +9,7 @@ type FormState = {
   budget: string;
   currency: string;
   travel_month: string;
+  travel_style: string;
 };
 
 const INITIAL_STATE: FormState = {
@@ -18,9 +19,11 @@ const INITIAL_STATE: FormState = {
   budget: "",
   currency: "USD",
   travel_month: "",
+  travel_style: "Solo",
 };
 
 const CURRENCIES = ["USD", "IDR", "EUR", "JPY", "SGD", "MYR"];
+const TRAVEL_STYLES = ["Solo", "Couple", "Family"];
 const MONTHS = [
   "January",
   "February",
@@ -66,6 +69,7 @@ export default function TripForm() {
         budget: Number(form.budget),
         currency: form.currency,
         travel_month: form.travel_month,
+        travel_style: form.travel_style,
       };
 
       const createRes = await fetch(`${apiUrl}/api/v1/trips`, {
@@ -213,6 +217,24 @@ export default function TripForm() {
               {MONTHS.map((month) => (
                 <option key={month} value={month}>
                   {month}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="sm:col-span-2">
+            <label htmlFor="travel_style" className={labelClasses}>
+              Travel Style
+            </label>
+            <select
+              id="travel_style"
+              value={form.travel_style}
+              onChange={(e) => updateField("travel_style", e.target.value)}
+              className={inputClasses}
+            >
+              {TRAVEL_STYLES.map((style) => (
+                <option key={style} value={style}>
+                  {style}
                 </option>
               ))}
             </select>

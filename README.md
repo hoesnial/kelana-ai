@@ -68,6 +68,13 @@ Console app that takes destination, country, days, budget, currency, and travel 
 - The form calls the backend (`POST /api/v1/trips` + `POST /api/v1/trips/{id}/generate`)
   and renders the returned AI itinerary.
 
+### Session 7: Trip History Dashboard
+
+- Multi-page app with a `/trips` dashboard that fetches trips from PostgreSQL via FastAPI.
+- Enhanced `TripCard` component: country flag, currency/budget formatting, color-coded
+  category badge (Backpacker / Standard / Luxury), and travel style badge (Family / Solo / Couple).
+- Client-side pagination when the trip list exceeds 10 items.
+
 ## Run
 
 ```bash

@@ -1,8 +1,8 @@
 const NAV_LINKS = [
-  { label: "Home", href: "#" },
-  { label: "Plan a Trip", href: "#plan" },
-  { label: "Destinations", href: "#destinations" },
-  { label: "About", href: "#about" },
+  { label: "Home", href: "/" },
+  { label: "Plan a Trip", href: "/#plan" },
+  { label: "Trip History", href: "/trips" },
+  { label: "Destinations", href: "/#destinations" },
 ];
 
 const RESOURCES = [
